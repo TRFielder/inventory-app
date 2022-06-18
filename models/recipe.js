@@ -7,6 +7,7 @@ const Schema = mongoose.Schema;
 const RecipeSchema = new Schema({
   name: { type: String, required: true, maxLength: 100 },
   ingredients: [{ type: Schema.Types.ObjectId, ref: "Ingredient" }], //Reference to the associated ingredients
+  description: { type: String, required: true },
 });
 
 // Virtual for Recipe's overall price, sums all ingredient unit_price values with Array.reduce()

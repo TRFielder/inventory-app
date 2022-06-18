@@ -3,5 +3,20 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
   body
-    block content
+    block sidebar 
+      ul(class="sidebar-nav")
+        li 
+          a(href="/inventory") Home 
+        li 
+          a(href="/inventory/recipes") All Recipes 
+        li 
+          a(href="/inventory/ingredients") All Ingredients 
+        li 
+          a(href="/inventory/recipe/create") Create new recipe 
+        li 
+          a(href="/inventory/ingredient/create") Create new ingredient 
+    div(class="content")
+      block content

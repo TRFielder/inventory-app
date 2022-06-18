@@ -11,6 +11,7 @@ const IngredientSchema = new Schema({
     enum: ["Meat", "Carbohydrates", "Seasoning", "Dairy", "Drink"],
   },
   unit_price: { type: Number, required: true },
+  type: { type: String, required: true },
 });
 
 //Export model
