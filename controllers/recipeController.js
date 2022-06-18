@@ -1,5 +1,7 @@
 exports.index = function (req, res) {
-  res.send("NOT IMPLEMENTED: Recipe list");
+  res.render("index", {
+    title: "Dashi",
+  });
 };
 
 // Display list of all recipes
