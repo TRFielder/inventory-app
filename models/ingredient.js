@@ -8,7 +8,7 @@ const IngredientSchema = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ["Meat", "Carbohydrates", "Seasoning", "Dairy", "Drink"],
+    enum: ["Meat", "Carbohydrates", "Plant", "Seasoning", "Dairy", "Drink"],
   },
   unit_price: { type: Number, required: true },
   description: { type: String, required: true },
