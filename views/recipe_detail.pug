@@ -6,5 +6,7 @@ block content
     p #[strong Description: ] #{description}
     hr
     h4 Ingredients 
-    each val in ingredients
-        p=val.name
+    ul 
+        each ingredient in ingredients
+            li 
+                a(href=ingredient.url) #{ingredient.name}
