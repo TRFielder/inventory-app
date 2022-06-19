@@ -92,7 +92,7 @@ exports.ingredient_create_post = [
 ];
 
 //Display detail page for a specific ingredient
-exports.ingredient_detail = function (req, res) {
+exports.ingredient_detail = function (req, res, next) {
   Ingredient.findById(req.params.id).exec(function (err, ingredient) {
     if (err) {
       return next(err);
