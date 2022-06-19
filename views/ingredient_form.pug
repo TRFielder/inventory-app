@@ -1,0 +1,29 @@
+extends layout 
+
+block content 
+    h1 #{title}
+
+    form(method="POST" action="")
+        div
+            label(for="name") Ingredient: 
+            input#name(type="text", placeholder="New ingredient", name="name", value=(undefined===ingredient ? "" : ingredient.name))
+            label(for="quantity") Quantity: 
+            input#quantity(type="number", placeholder=1, name="quantity" value=(undefined===ingredient ? "" : ingredient.quantity))
+            label(for="unit_price") Unit Price: 
+            input#unit_price(type="number", placeholder=1, name="unit_price", value=(undefined===ingredient ? "" : ingredient.unit_price))
+            label(for="type") Type: 
+            select#type(name="type")
+                option(value="Meat") Meat
+                option(value="Carbohydrates") Carbohydrates 
+                option(value="Plant") Plant
+                option(value="Seasoning") Seasoning
+                option(value="Dairy") Dairy
+                option(value="Drink") Drink
+            label(for="description") Description: 
+            input#description(type="text", placeholder="Say something nice about the new ingredient", name="description", value=(undefined===ingredient ? "" : ingredient.description))
+        button(type="submit") Submit 
+
+    if errors 
+        ul
+            for error in errors 
+                li!= error.msg

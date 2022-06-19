@@ -5,13 +5,13 @@ block content
   p A stock manager for the noodle master in your life
 
   h2 Summary
-//-
+
   if error 
     p Error getting dynamic content 
   else 
     p !{title} has the following record counts
 
-    ul 
+    ul(class="list-nobullet")
       li #[strong Ingredients:] !{data.ingredient_count}
       li #[strong Recipes:] !{data.recipe_count}
-      //
+      

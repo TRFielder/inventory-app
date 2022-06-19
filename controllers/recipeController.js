@@ -3,9 +3,23 @@ const Recipe = require("../models/recipe");
 const async = require("async");
 
 exports.index = function (req, res) {
-  res.render("index", {
-    title: "Dashi",
-  });
+  async.parallel(
+    {
+      recipe_count: function (callback) {
+        Recipe.countDocuments({}, callback); //Empty object as match condition -> finds all documents in collection
+      },
+      ingredient_count: function (callback) {
+        Ingredient.countDocuments({}, callback);
+      },
+    },
+    function (err, results) {
+      res.render("index", {
+        title: "Dashi",
+        error: err,
+        data: results,
+      });
+    }
+  );
 };
 
 // Display list of all recipes

@@ -3,10 +3,11 @@ extends layout
 block content 
     h1=title 
 
-    ul 
+    ul(class="list-nobullet") 
         each recipe in recipe_list 
             li 
                 a(href=recipe.url) #{recipe.name}
                 p= recipe.description
+                hr
         else 
             li There are no recipes

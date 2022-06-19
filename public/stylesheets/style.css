@@ -14,3 +14,7 @@ a {
   flex-direction: column;
   margin: 10px;
 }
+
+.list-nobullet {
+  list-style: none;
+}
