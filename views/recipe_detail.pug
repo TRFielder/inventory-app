@@ -1,0 +1,10 @@
+extends layout 
+
+block content 
+    h1=title
+
+    p #[strong Description: ] #{description}
+    hr
+    h4 Ingredients 
+    each val in ingredients
+        p=val.name

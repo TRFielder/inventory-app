@@ -7,7 +7,7 @@ block content
         each ingredient in ingredient_list 
             li 
                 a(href=ingredient.url) #{ingredient.name}
-                p= ingredient.unit_price
-                p Qty:  #{ingredient.quantity}
+                p £#{ingredient.priceGBP}
+                p In stock:  #{ingredient.quantity}
         else 
             li There are no ingredients

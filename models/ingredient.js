@@ -14,6 +14,11 @@ const IngredientSchema = new Schema({
   description: { type: String, required: true },
 });
 
+// Virtual for ingredient's price in GBP
+IngredientSchema.virtual("priceGBP").get(function () {
+  return (Math.round(this.unit_price * 100) / 100).toFixed(2);
+});
+
 // Virtual for ingredient's URL
 IngredientSchema.virtual("url").get(function () {
   return "/inventory/ingredient/" + this._id;

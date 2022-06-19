@@ -1,0 +1,9 @@
+extends layout 
+
+block content 
+    h1=ingredient.name
+
+    p #[strong Description:] #{ingredient.description}
+    p #[strong Unit Price:] £#{ingredient.priceGBP}
+    p #[strong In stock:] #{ingredient.quantity}
+    p #[strong Category:] #{ingredient.type} 

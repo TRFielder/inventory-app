@@ -31,9 +31,21 @@ exports.ingredient_create_post = function (req, res) {
   res.send("NOT IMPLEMENTED: Ingredient create POST");
 };
 
-//Display detail page for a specific recipe
+//Display detail page for a specific ingredient
 exports.ingredient_detail = function (req, res) {
-  res.send("NOT IMPLEMENTED: Ingredient detail GET");
+  Ingredient.findById(req.params.id).exec(function (err, ingredient) {
+    if (err) {
+      return next(err);
+    }
+    if (ingredient == null) {
+      // No results
+      let err = new Error("Ingredient not found");
+      err.status = 404;
+      return next(err);
+    }
+    // Successful, so render.
+    res.render("ingredient_detail", { ingredient: ingredient });
+  });
 };
 
 //Display ingredient update form on GET
