@@ -14,5 +14,10 @@ const IngredientSchema = new Schema({
   description: { type: String, required: true },
 });
 
+// Virtual for ingredient's URL
+IngredientSchema.virtual("url").get(function () {
+  return "/inventory/ingredient/" + this._id;
+});
+
 //Export model
 module.exports = mongoose.model("Ingredient", IngredientSchema);

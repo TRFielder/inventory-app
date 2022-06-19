@@ -1,10 +1,24 @@
+const { nextTick } = require("async");
+const Ingredient = require("../models/ingredient");
+
 exports.index = function (req, res) {
-  res.send("NOT IMPLEMENTED: Recipe list");
+  res.render("index", { title: "Dashi" });
 };
 
 // Display list of all ingredients
 exports.ingredient_list = function (req, res) {
-  res.send("NOT IMPLEMENTED: Ingredient list GET");
+  Ingredient.find()
+    .sort([["name", "ascending"]])
+    .exec(function (err, list_ingredients) {
+      if (err) {
+        return next(err);
+      }
+      //Successful, so render
+      res.render("ingredient_list", {
+        title: "Ingredient List",
+        ingredient_list: list_ingredients,
+      });
+    });
 };
 
 //Display ingredient create form on GET

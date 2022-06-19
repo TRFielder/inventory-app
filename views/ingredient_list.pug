@@ -1,0 +1,13 @@
+extends layout 
+
+block content 
+    h1=title 
+
+    ul 
+        each ingredient in ingredient_list 
+            li 
+                a(href=ingredient.url) #{ingredient.name}
+                p= ingredient.unit_price
+                p Qty:  #{ingredient.quantity}
+        else 
+            li There are no ingredients

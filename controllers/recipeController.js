@@ -1,3 +1,5 @@
+const Recipe = require("../models/recipe");
+
 exports.index = function (req, res) {
   res.render("index", {
     title: "Dashi",
@@ -6,7 +8,18 @@ exports.index = function (req, res) {
 
 // Display list of all recipes
 exports.recipe_list = function (req, res) {
-  res.send("NOT IMPLEMENTED: Recipe list GET");
+  Recipe.find()
+    .sort([["name", "ascending"]])
+    .exec(function (err, list_recipes) {
+      if (err) {
+        return next(err);
+      }
+      //Successful, so render
+      res.render("recipe_list", {
+        title: "Recipe List",
+        recipe_list: list_recipes,
+      });
+    });
 };
 
 //Display recipe create form on GET

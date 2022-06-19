@@ -13,8 +13,13 @@ const RecipeSchema = new Schema({
 // Virtual for Recipe's overall price, sums all ingredient unit_price values with Array.reduce()
 RecipeSchema.virtual("price").get(function () {
   return this.ingredients.reduce(function (prev, curr) {
+    console.log(curr);
     return prev + curr.unit_price;
   }, 0);
+});
+
+RecipeSchema.virtual("url").get(function () {
+  return "/inventory/recipe/" + this._id;
 });
 
 module.exports = mongoose.model("Recipe", RecipeSchema);
