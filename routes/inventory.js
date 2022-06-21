@@ -26,13 +26,13 @@ router.get("/recipes", recipe_controller.recipe_list);
 router.get("/recipe/:id/update", recipe_controller.recipe_update_get);
 
 // POST request to update recipe
-router.get("/book/:id/update", recipe_controller.recipe_update_post);
+router.post("/book/:id/update", recipe_controller.recipe_update_post);
 
 // GET request to delete recipe
 router.get("/recipe/:id/delete", recipe_controller.recipe_delete_get);
 
 // POST request to delete recipe
-router.get("/recipe/:id/delete", recipe_controller.recipe_delete_post);
+router.post("/recipe/:id/delete", recipe_controller.recipe_delete_post);
 
 // ------------------------      INGREDIENT ROUTES      ----------------------
 
@@ -55,7 +55,7 @@ router.get(
 );
 
 // POST request to update ingredient
-router.get(
+router.post(
   "/ingredient/:id/update",
   ingredient_controller.ingredient_update_post
 );
@@ -67,7 +67,7 @@ router.get(
 );
 
 // POST request to delete ingredient
-router.get(
+router.post(
   "/ingredient/:id/delete",
   ingredient_controller.ingredient_delete_post
 );

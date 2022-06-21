@@ -7,3 +7,9 @@ block content
     p #[strong Unit Price:] £#{ingredient.priceGBP}
     p #[strong In stock:] #{ingredient.quantity}
     p #[strong Category:] #{ingredient.type} 
+
+    hr
+    p
+        a(href=ingredient.url + "/delete") Delete Ingredient 
+    p 
+        a(href=ingredient.url + "/update") Update Ingredient

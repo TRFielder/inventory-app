@@ -10,7 +10,7 @@ block content
             label(for="quantity") Quantity: 
             input#quantity(type="number", placeholder=1, name="quantity" value=(undefined===ingredient ? "" : ingredient.quantity))
             label(for="unit_price") Unit Price: 
-            input#unit_price(type="number", placeholder=1, name="unit_price", value=(undefined===ingredient ? "" : ingredient.unit_price))
+            input#unit_price(type="number", step="0.01", min="0.01" placeholder=1, name="unit_price", value=(undefined===ingredient ? "" : ingredient.unit_price))
             label(for="type") Type: 
             select#type(name="type")
                 option(value="Meat") Meat

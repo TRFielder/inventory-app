@@ -1,4 +1,5 @@
 const { body, validationResult } = require("express-validator");
+const { mongoose } = require("mongoose");
 const Ingredient = require("../models/ingredient");
 
 exports.index = function (req, res) {
@@ -93,6 +94,9 @@ exports.ingredient_create_post = [
 
 //Display detail page for a specific ingredient
 exports.ingredient_detail = function (req, res, next) {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.redirect("../ingredients");
+  }
   Ingredient.findById(req.params.id).exec(function (err, ingredient) {
     if (err) {
       return next(err);
@@ -110,7 +114,22 @@ exports.ingredient_detail = function (req, res, next) {
 
 //Display ingredient update form on GET
 exports.ingredient_update_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: Ingredient update GET");
+  Ingredient.findById(req.params.id, function (err, ingredient) {
+    if (err) {
+      return next(err);
+    }
+    if (ingredient == null) {
+      //No results
+      let err = new Error("Ingredient not found");
+      err.status = 404;
+      return next(err);
+    }
+    //Successful, so render
+    res.render("ingredient_form", {
+      title: "Update ingredient",
+      ingredient: ingredient,
+    });
+  });
 };
 
 //Handle ingredient update on POST
@@ -120,10 +139,32 @@ exports.ingredient_update_post = function (req, res) {
 
 //Display ingredient delete form on GET
 exports.ingredient_delete_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: Ingredient delete GET");
+  Ingredient.findById(req.params.id, function (err, ingredient) {
+    if (err) {
+      return next(err);
+    }
+    if (ingredient == null) {
+      //No results
+      let err = new Error("Ingredient not found");
+      err.status = 404;
+      return next(err);
+    }
+    //Successful, so render
+    res.render("ingredient_delete", {
+      title: "Delete ingredient",
+      ingredient: ingredient,
+    });
+  });
 };
 
-//Handle ingredient delete on form on POST
+//Handle ingredient delete form on POST
 exports.ingredient_delete_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: Ingredient delete POST");
+  //Assume valid ingredient ID if we've got to this point
+  Ingredient.findByIdAndRemove(req.body.id, function deleteIngredient(err) {
+    if (err) {
+      return next(err);
+    }
+    // Success, so redirect to the ingredient list
+    res.redirect("/inventory/ingredients");
+  });
 };

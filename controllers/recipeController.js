@@ -1,6 +1,7 @@
 const Ingredient = require("../models/ingredient");
 const Recipe = require("../models/recipe");
 const async = require("async");
+const { mongoose } = require("mongoose");
 
 exports.index = function (req, res) {
   async.parallel(
@@ -49,7 +50,10 @@ exports.recipe_create_post = function (req, res) {
 };
 
 //Display detail page for a specific recipe
-exports.recipe_detail = function (req, res) {
+exports.recipe_detail = function (req, res, next) {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.redirect("../recipes");
+  }
   async.parallel(
     {
       recipe: function (callback) {
@@ -66,12 +70,12 @@ exports.recipe_detail = function (req, res) {
         err.status = 404;
         return next(err);
       }
-      console.log(results.recipe.ingredients[0].name);
       // Successful, so render
       res.render("recipe_detail", {
         title: results.recipe.name,
         description: results.recipe.description,
         ingredients: results.recipe.ingredients,
+        recipe: results.recipe,
       });
     }
   );
@@ -79,7 +83,19 @@ exports.recipe_detail = function (req, res) {
 
 //Display ingredient update form on GET
 exports.recipe_update_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: recipe update GET");
+  Recipe.findById(req.params.id, function (err, recipe) {
+    if (err) {
+      return next(err);
+    }
+    if (recipe == null) {
+      //No results
+      let err = new Error("Recipe not found");
+      err.status = 404;
+      return next(err);
+    }
+    //Successful, so render
+    res.render("recipe_form", { title: "Update recipe", recipe: recipe });
+  });
 };
 
 //Handle recipe update on POST

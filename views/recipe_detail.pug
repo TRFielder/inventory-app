@@ -10,3 +10,8 @@ block content
         each ingredient in ingredients
             li 
                 a(href=ingredient.url) #{ingredient.name}
+    hr
+    p
+        a(href=recipe.url + "/delete") Delete Recipe 
+    p 
+        a(href=recipe.url + "/update") Update Recipe
