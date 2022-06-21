@@ -128,14 +128,65 @@ exports.ingredient_update_get = function (req, res) {
     res.render("ingredient_form", {
       title: "Update ingredient",
       ingredient: ingredient,
+      selected_ingredient: ingredient._id,
     });
   });
 };
 
 //Handle ingredient update on POST
-exports.ingredient_update_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: Ingredient update POST");
-};
+exports.ingredient_update_post = [
+  // validate and sanitise name field
+  body("name", "Ingredient name required").trim().isLength({ min: 1 }).escape(),
+  body("description", "Description required")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("quantity", "Quantity must be a non-zero integer")
+    .isInt({ min: 0 })
+    .escape(),
+  body("unit_price", "Unit price must be a non zero value").isFloat({
+    min: 0.01,
+  }),
+  //Process request after validation and sanitisation
+  (req, res, next) => {
+    //Extract the validation errors from a request
+    const errors = validationResult(req);
+    console.log("Creating ingredient object");
+    //Create an ingredient object with escaped and trimmed data
+    let ingredient = new Ingredient({
+      name: req.body.name,
+      quantity: req.body.quantity,
+      type: req.body.type,
+      unit_price: req.body.unit_price,
+      description: req.body.description,
+      _id: req.params.id, //This is required or a new ID will be assigned
+    });
+    console.log("Created ingredient object");
+    if (!errors.isEmpty()) {
+      //There are errors. Render the form again with sanitised values/error messages.
+      res.render("ingredient_form", {
+        title: "Add new ingredient",
+        ingredient: ingredient,
+        selected_ingredient: ingredient._id,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      Ingredient.findByIdAndUpdate(
+        req.params.id,
+        ingredient,
+        {},
+        function (err, theingredient) {
+          if (err) {
+            return next(err);
+          }
+          //Successful - redirect to book detail page
+          res.redirect(theingredient.url);
+        }
+      );
+    }
+  },
+];
 
 //Display ingredient delete form on GET
 exports.ingredient_delete_get = function (req, res) {
