@@ -105,7 +105,31 @@ exports.recipe_update_post = function (req, res) {
 
 //Display recipe delete form on GET
 exports.recipe_delete_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: recipe delete GET");
+  async.parallel(
+    {
+      recipe: function (callback) {
+        Recipe.findById(req.params.id).populate("ingredients").exec(callback);
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      if (results.recipe == null) {
+        // No results
+        let err = new Error("Recipe not found");
+        err.status = 404;
+        return next(err);
+      }
+      // Successful, so render
+      res.render("recipe_delete", {
+        title: "Delete recipe",
+        description: results.recipe.description,
+        ingredients: results.recipe.ingredients,
+        recipe: results.recipe,
+      });
+    }
+  );
 };
 
 //Handle recipe delete on form on POST
