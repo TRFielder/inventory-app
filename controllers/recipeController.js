@@ -2,6 +2,7 @@ const Ingredient = require("../models/ingredient");
 const Recipe = require("../models/recipe");
 const async = require("async");
 const { mongoose } = require("mongoose");
+const { body, validationResult } = require("express-validator");
 
 exports.index = function (req, res) {
   async.parallel(
@@ -41,13 +42,108 @@ exports.recipe_list = function (req, res) {
 
 //Display recipe create form on GET
 exports.recipe_create_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: Recipe create GET");
+  // We will only allow creation of recipes based on existing ingredients
+  //Get the full list of ingredients which the user can select from
+  Ingredient.find()
+    .sort([["name", "ascending"]])
+    .exec(function (err, list_ingredients) {
+      if (err) {
+        return next(err);
+      }
+      //Successful, so render
+      res.render("recipe_form", {
+        title: "Add new recipe",
+        ingredient_list: list_ingredients,
+      });
+    });
 };
 
 //Handle recipe create on POST
-exports.recipe_create_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: Recipe create POST");
-};
+exports.recipe_create_post = [
+  //Validate and sanitise name and description fields
+  body("name", "Recipe name required").trim().isLength({ min: 1 }).escape(),
+  body("description", "Description required")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+
+  //Process request after validation and sanitisation
+  (req, res, next) => {
+    async.series(
+      {
+        ingredients: function (callback) {
+          //The selected ingredients are only names. Find their objectIDs in Mongo and store them to a new array
+          let ingredients = [];
+          if (Array.isArray(req.body.ingredients)) {
+            //Multiple ingredients selected
+            req.body.ingredients.forEach((ingredient) => {
+              // Find the ingredient by name
+              Ingredient.findOne({ name: ingredient }, function (err, result) {
+                //Push its ID to the ingredient array
+                ingredients.push(result._id);
+              });
+            });
+          } else {
+            //Only one ingredient selected. Find it by name
+            Ingredient.findOne(
+              { name: req.body.ingredients },
+              function (err, result) {
+                //Push its ID to the ingredient array
+                ingredients.push(result._id);
+              }
+            );
+          }
+          callback(null, ingredients);
+        },
+      },
+      function (err, results) {
+        console.log(results);
+        //Extract the validation errors from a result
+        const errors = validationResult(req);
+
+        let recipe = new Recipe({
+          name: req.body.name,
+          description: req.body.description,
+          ingredients: results.ingredients,
+        });
+
+        if (!errors.isEmpty()) {
+          //There are errors. Render the form again with sanitised values/error messages.
+          res.render("recipe_form", {
+            title: "Add new recipe",
+            recipe: recipe,
+            errors: errors.array(),
+          });
+          return;
+        } else {
+          //Data from form is valid
+          //Check if recipe with same name already exists
+          Recipe.findOne({ name: req.body.name }).exec(function (
+            err,
+            found_recipe
+          ) {
+            if (err) {
+              return next(err);
+            }
+
+            if (found_recipe) {
+              //Recipe exists, redirect to its detail page
+              res.redirect(found_recipe.url);
+            } else {
+              recipe.save(function (err) {
+                if (err) {
+                  return next(err);
+                }
+                //Recipe saved. Redirect to recipe detail page
+                res.redirect(recipe.url);
+              });
+            }
+          });
+        }
+      }
+    );
+  },
+];
 
 //Display detail page for a specific recipe
 exports.recipe_detail = function (req, res, next) {
@@ -134,5 +230,12 @@ exports.recipe_delete_get = function (req, res) {
 
 //Handle recipe delete on form on POST
 exports.recipe_delete_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: recipe delete POST");
+  //Assume valid recipe ID if we've got to this point
+  Recipe.findByIdAndRemove(req.body.id, function deleteRecipe(err) {
+    if (err) {
+      return next(err);
+    }
+    // Success, so redirect to the recipe list
+    res.redirect("/inventory/recipes");
+  });
 };

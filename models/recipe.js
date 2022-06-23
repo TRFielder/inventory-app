@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { populate } = require("./ingredient");
 
 const Schema = mongoose.Schema;
 

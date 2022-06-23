@@ -1,0 +1,22 @@
+extends layout 
+
+block content 
+    h1 #{title}
+
+    form(method="POST" action="")
+        div
+            label(for="name") Name: 
+            input#name(type="text", placeholder="New recipe", name="name", value=(undefined===recipe ? "" : recipe.name))
+            label(for="type") Description: 
+            input#description(type="text", placeholder="Mouthwatering new recipe", name="description", value=(undefined===recipe ? "" : recipe.description))
+            label(for="ingredients") Ingredients: 
+            select#ingredients(name="ingredients" multiple)
+                each ingredient in ingredient_list 
+                    option(value=ingredient.name) #{ingredient.name}
+
+        button(type="submit") Submit 
+
+    if errors 
+        ul
+            for error in errors 
+                li!= error.msg
