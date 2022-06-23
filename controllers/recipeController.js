@@ -66,82 +66,58 @@ exports.recipe_create_post = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
+  body("ingredients.*", "There must be at least one ingredient.").exists(),
 
   //Process request after validation and sanitisation
   (req, res, next) => {
-    async.series(
-      {
-        ingredients: function (callback) {
-          //The selected ingredients are only names. Find their objectIDs in Mongo and store them to a new array
-          let ingredients = [];
-          if (Array.isArray(req.body.ingredients)) {
-            //Multiple ingredients selected
-            req.body.ingredients.forEach((ingredient) => {
-              // Find the ingredient by name
-              Ingredient.findOne({ name: ingredient }, function (err, result) {
-                //Push its ID to the ingredient array
-                ingredients.push(result._id);
-              });
-            });
-          } else {
-            //Only one ingredient selected. Find it by name
-            Ingredient.findOne(
-              { name: req.body.ingredients },
-              function (err, result) {
-                //Push its ID to the ingredient array
-                ingredients.push(result._id);
-              }
-            );
+    //Extract the validation errors from a result
+    const errors = validationResult(req);
+
+    let recipe = new Recipe({
+      name: req.body.name,
+      description: req.body.description,
+      ingredients: req.body.ingredients,
+    });
+
+    if (!errors.isEmpty()) {
+      //There are errors. Render the form again with sanitised values/error messages.
+      Ingredient.find()
+        .sort([["name", "ascending"]])
+        .exec(function (err, list_ingredients) {
+          if (err) {
+            return next(err);
           }
-          callback(null, ingredients);
-        },
-      },
-      function (err, results) {
-        console.log(results);
-        //Extract the validation errors from a result
-        const errors = validationResult(req);
-
-        let recipe = new Recipe({
-          name: req.body.name,
-          description: req.body.description,
-          ingredients: results.ingredients,
-        });
-
-        if (!errors.isEmpty()) {
-          //There are errors. Render the form again with sanitised values/error messages.
+          //Successful, so render
           res.render("recipe_form", {
             title: "Add new recipe",
-            recipe: recipe,
-            errors: errors.array(),
+            ingredient_list: list_ingredients,
           });
-          return;
+        });
+      return;
+    } else {
+      //Data from form is valid
+      //Check if recipe with same name already exists
+      Recipe.findOne({ name: req.body.name }).exec(function (
+        err,
+        found_recipe
+      ) {
+        if (err) {
+          return next(err);
+        }
+        if (found_recipe) {
+          //Recipe exists, redirect to its detail page
+          res.redirect(found_recipe.url);
         } else {
-          //Data from form is valid
-          //Check if recipe with same name already exists
-          Recipe.findOne({ name: req.body.name }).exec(function (
-            err,
-            found_recipe
-          ) {
+          recipe.save(function (err) {
             if (err) {
               return next(err);
             }
-
-            if (found_recipe) {
-              //Recipe exists, redirect to its detail page
-              res.redirect(found_recipe.url);
-            } else {
-              recipe.save(function (err) {
-                if (err) {
-                  return next(err);
-                }
-                //Recipe saved. Redirect to recipe detail page
-                res.redirect(recipe.url);
-              });
-            }
+            //Recipe saved. Redirect to recipe detail page
+            res.redirect(recipe.url);
           });
         }
-      }
-    );
+      });
+    }
   },
 ];
 
@@ -189,8 +165,19 @@ exports.recipe_update_get = function (req, res) {
       err.status = 404;
       return next(err);
     }
-    //Successful, so render
-    res.render("recipe_form", { title: "Update recipe", recipe: recipe });
+    Ingredient.find()
+      .sort([["name", "ascending"]])
+      .exec(function (err, list_ingredients) {
+        if (err) {
+          return next(err);
+        }
+        //Successful, so render
+        res.render("recipe_form", {
+          title: "Add new recipe",
+          ingredient_list: list_ingredients,
+          recipe: recipe,
+        });
+      });
   });
 };
 

@@ -12,7 +12,7 @@ block content
             label(for="ingredients") Ingredients: 
             select#ingredients(name="ingredients" multiple)
                 each ingredient in ingredient_list 
-                    option(value=ingredient.name) #{ingredient.name}
+                    option(value=ingredient._id) #{ingredient.name}
 
         button(type="submit") Submit 
 
