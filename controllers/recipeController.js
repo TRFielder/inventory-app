@@ -182,9 +182,60 @@ exports.recipe_update_get = function (req, res) {
 };
 
 //Handle recipe update on POST
-exports.recipe_update_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: recipe update POST");
-};
+exports.recipe_update_post = [
+  //Validate and sanitise name and description fields
+  body("name", "Recipe name required").trim().isLength({ min: 1 }).escape(),
+  body("description", "Description required")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("ingredients.*", "There must be at least one ingredient.").exists(),
+
+  //Process request after validation and sanitisation
+  (req, res, next) => {
+    //Extract the validation errors from a result
+    const errors = validationResult(req);
+
+    let recipe = new Recipe({
+      _id: req.params.id, //This is required or a new ID will be assigned
+      name: req.body.name,
+      description: req.body.description,
+      ingredients: req.body.ingredients,
+    });
+
+    if (!errors.isEmpty()) {
+      //There are errors. Render the form again with sanitised values/error messages.
+      Ingredient.find()
+        .sort([["name", "ascending"]])
+        .exec(function (err, list_ingredients) {
+          if (err) {
+            return next(err);
+          }
+          //Successful, so render
+          res.render("recipe_form", {
+            title: "Add new recipe",
+            ingredient_list: list_ingredients,
+          });
+        });
+      return;
+    } else {
+      //Data from form is valid
+      //Find the recipe entry and update it
+      Recipe.findByIdAndUpdate(
+        req.params.id,
+        recipe,
+        {},
+        function (err, therecipe) {
+          if (err) {
+            return next(err);
+          }
+          //Successful - redirect to recipe detail page
+          res.redirect(therecipe.url);
+        }
+      );
+    }
+  },
+];
 
 //Display recipe delete form on GET
 exports.recipe_delete_get = function (req, res) {
