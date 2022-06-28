@@ -14,7 +14,7 @@ var app = express();
 const compression = require("compression");
 const helmet = require("helmet");
 
-app.use("compression");
+app.use(compression()); //Compress all routes
 app.use(helmet());
 
 //Set up mongoose connection
