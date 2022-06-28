@@ -18,3 +18,12 @@ a {
 .list-nobullet {
   list-style: none;
 }
+
+.stock-status-ok {
+  color: rgb(15, 248, 15);
+}
+
+.stock-status-low {
+  color: red;
+  font-weight: bold;
+}

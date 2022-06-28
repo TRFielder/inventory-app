@@ -11,6 +11,12 @@ const inventoryRouter = require("./routes/inventory"); //Import routes for the r
 
 var app = express();
 
+const compression = require("compression");
+const helmet = require("helmet");
+
+app.use("compression");
+app.use(helmet());
+
 //Set up mongoose connection
 const mongoose = require("mongoose");
 const dev_db_url = process.env.MONGODB_URI;

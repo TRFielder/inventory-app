@@ -10,6 +10,7 @@ block content
         each ingredient in ingredients
             li 
                 a(href=ingredient.url) #{ingredient.name}
+                p(class= ingredient.quantity < 5 ? "stock-status-low" : "stock-status-ok") (#{ingredient.quantity} in stock)
     hr
     p
         a(href=recipe.url + "/delete") Delete Recipe 
